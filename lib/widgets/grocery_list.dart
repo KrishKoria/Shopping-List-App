@@ -14,7 +14,8 @@ class GroceryList extends StatefulWidget {
 
 class _GroceryListState extends State<GroceryList> {
   List<GroceryItem> _groceryItems = [];
-
+  var _isLoading = true;
+  String? _hasErroredOut;
   @override
   void initState() {
     super.initState();
@@ -27,6 +28,11 @@ class _GroceryListState extends State<GroceryList> {
       'shopping-list.json',
     );
     final response = await http.get(url);
+    if (response.statusCode >= 400) {
+      setState(() {
+        _hasErroredOut = 'Something went wrong!, Maybe Try again later.';
+      });
+    }
     final Map<String, dynamic> responseData = json.decode(response.body);
     final List<GroceryItem> loadedItems = [];
     for (final item in responseData.entries) {
@@ -43,6 +49,7 @@ class _GroceryListState extends State<GroceryList> {
     }
     setState(() {
       _groceryItems = loadedItems;
+      _isLoading = false;
     });
   }
 
@@ -67,6 +74,11 @@ class _GroceryListState extends State<GroceryList> {
     Widget content = const Center(
       child: Text("No Items Added Yet."),
     );
+    if (_isLoading) {
+      content = const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     if (_groceryItems.isNotEmpty) {
       content = ListView.builder(
         itemCount: _groceryItems.length,
@@ -87,6 +99,11 @@ class _GroceryListState extends State<GroceryList> {
             ),
           ),
         ),
+      );
+    }
+    if (_hasErroredOut != null) {
+      content = Center(
+        child: Text(_hasErroredOut!),
       );
     }
     // this is how we get the data from the new item screen using named routes
