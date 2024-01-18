@@ -141,22 +141,6 @@ class _GroceryListState extends State<GroceryList> {
         child: Text(_hasErroredOut!),
       );
     }
-    // this is how we get the data from the new item screen using named routes
-    // final routeArgs =
-    //     ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    // if (routeArgs != null) {
-    //   final newItems = [
-    //     GroceryItem(
-    //       id: DateTime.now().toString(),
-    //       name: routeArgs['name'] ?? '',
-    //       quantity: routeArgs['quantity'] ?? 1,
-    //       category: routeArgs['category'] ?? categories[Categories.vegetables]!,
-    //     ),
-    //   ];
-    //   setState(() {
-    //     _groceryItems.addAll(newItems);
-    //   });
-    // }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Grocery List'),
