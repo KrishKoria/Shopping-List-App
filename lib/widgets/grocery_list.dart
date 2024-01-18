@@ -27,30 +27,44 @@ class _GroceryListState extends State<GroceryList> {
       'shopping-list-app-ee595-default-rtdb.asia-southeast1.firebasedatabase.app',
       'shopping-list.json',
     );
-    final response = await http.get(url);
-    if (response.statusCode >= 400) {
+    try {
+      final response = await http.get(url);
+      if (response.statusCode >= 400) {
+        setState(() {
+          _hasErroredOut = 'Something went wrong!, Maybe Try again later.';
+        });
+      }
+      if (response.body == 'null') {
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final List<GroceryItem> loadedItems = [];
+      for (final item in responseData.entries) {
+        final category = categories.entries.firstWhere(
+          (catItem) => catItem.value.name == item.value['category'],
+        );
+        final groceryItem = GroceryItem(
+          id: item.key,
+          name: item.value['name'],
+          quantity: item.value['quantity'],
+          category: category.value,
+        );
+        loadedItems.add(groceryItem);
+      }
+      setState(
+        () {
+          _groceryItems = loadedItems;
+          _isLoading = false;
+        },
+      );
+    } catch (error) {
       setState(() {
         _hasErroredOut = 'Something went wrong!, Maybe Try again later.';
       });
     }
-    final Map<String, dynamic> responseData = json.decode(response.body);
-    final List<GroceryItem> loadedItems = [];
-    for (final item in responseData.entries) {
-      final category = categories.entries.firstWhere(
-        (catItem) => catItem.value.name == item.value['category'],
-      );
-      final groceryItem = GroceryItem(
-        id: item.key,
-        name: item.value['name'],
-        quantity: item.value['quantity'],
-        category: category.value,
-      );
-      loadedItems.add(groceryItem);
-    }
-    setState(() {
-      _groceryItems = loadedItems;
-      _isLoading = false;
-    });
   }
 
   void _addItem() async {
