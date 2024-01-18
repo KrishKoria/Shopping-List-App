@@ -47,8 +47,13 @@ class _GroceryListState extends State<GroceryList> {
   }
 
   void _addItem() async {
-    await Navigator.of(context).pushNamed('/new-item');
+    final newItem =
+        await Navigator.of(context).pushNamed('/new-item') as GroceryItem;
     _loadItems();
+
+    setState(() {
+      _groceryItems.add(newItem);
+    });
   }
 
   void _deleteItem(GroceryItem item) {

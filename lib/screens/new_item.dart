@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shopping_list_app/data/categories.dart';
 import 'package:shopping_list_app/models/category.dart';
 import 'package:http/http.dart' as http;
+import 'package:shopping_list_app/models/grocery_item.dart';
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -34,7 +35,7 @@ class _NewItemState extends State<NewItem> {
         'shopping-list-app-ee595-default-rtdb.asia-southeast1.firebasedatabase.app',
         'shopping-list.json',
       );
-      await http.post(
+      final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode(
@@ -45,11 +46,18 @@ class _NewItemState extends State<NewItem> {
           },
         ),
       );
-
+      Map<String, dynamic> responseData = json.decode(response.body);
       if (!context.mounted) {
         return;
       }
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(
+        GroceryItem(
+          id: responseData['name'],
+          name: _enteredName,
+          quantity: _enteredQuantity,
+          category: _selectedCategory,
+        ),
+      );
     }
   }
 
