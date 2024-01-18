@@ -63,10 +63,31 @@ class _GroceryListState extends State<GroceryList> {
     });
   }
 
-  void _deleteItem(GroceryItem item) {
+  void _deleteItem(GroceryItem item) async {
+    final url = Uri.https(
+      'shopping-list-app-ee595-default-rtdb.asia-southeast1.firebasedatabase.app',
+      'shopping-list/${item.id}.json',
+    );
+    final index = _groceryItems.indexOf(item);
     setState(() {
       _groceryItems.remove(item);
     });
+    final response = await http.delete(url);
+    if (response.statusCode >= 400) {
+      setState(
+        () {
+          _groceryItems.insert(index, item);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Error occurred while deleting item.'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              duration: Duration(seconds: 1),
+            ),
+          );
+        },
+      );
+    }
   }
 
   @override
